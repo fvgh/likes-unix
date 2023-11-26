@@ -1,0 +1,32 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-media 
+# - Modification of documents (meta-data)
+# - Any access to network (including mounts)
+# - Change of user settings
+
+# Suppress noisy warnings
+##############################
+
+# Deny access to network mounts
+#include <local/file-chooser>
+deny @{run}/mount/utab r,
+
+# Deny WebRTC / Camera
+deny /dev/video[0-9] rw,
+deny @{sys}/bus/media/devices/ r,
+
+# Machine ID might be required required for DRM
+deny /etc/machine-id r,
+deny /var/lib/dbus/machine-id r,
+
+# Deny modification of desktop settings
+deny /run/user/*/dconf/user w,
+
+# Noisy: Update meta-data not possible
+deny /**/*.{avi,mkv,mp4,m4v} w,

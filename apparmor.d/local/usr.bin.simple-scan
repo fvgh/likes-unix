@@ -1,0 +1,25 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# NOTE: This file only denys unnecessary acces for USB scanners.
+# Remove unused scanners from /etc/sane.d/dll.conf to avoid noisy AA violation reports.
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-office 
+# - Any access to network (including mounts)
+# - Any scanner not attached via USB
+
+# Suppress noisy warnings
+##############################
+
+# Deny access to network locations
+#include <local/file-chooser>
+
+# SCSI not supported (only USB)
+deny @{sys}/bus/scsi/devices/ r,
+
+# Not used for USB scanner
+deny @{sys}/class/ r,

@@ -1,0 +1,33 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-base 
+# - Execution of other applications (opening downloaded files)
+# - Network access via SSL proxy
+
+# Suppress noisy warnings
+##############################
+
+# Deny access to network locations
+#include <local/file-chooser>
+
+# Deny modification of desktop settings
+deny /run/user/*/dconf/user w,
+
+# Deny SSL information/certificates (required for SSL proxy)
+deny /etc/ssl/openssl.cnf r,
+
+# Transmission is not allowed to start external programs. Hence, default apps are not relevant.
+deny /etc/*/defaults.list r,
+deny /etc/mailcap r,
+deny /etc/mime.types r,
+deny /etc/xdg/{,*-}mimeapps.list r,
+deny /local/share/applications/mimeapps.list r,
+deny @{HOME}/opt/local/share/applications/mimeapps.list r,
+deny @{HOME}/opt/local/share/applications/ r,
+deny /usr/share/*/applications/ r,
+deny /usr/share/*/applications/mimeinfo.cache r,

@@ -1,0 +1,16 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Create <local/user-media-rw> for custom settings and/or adapt <tunables/xdg-user-dirs>.
+#include if exists <local/user-media-rw>
+#include <abstractions/user-base-rw>
+
+owner @{HOME}/{@{XDG_MUSIC_DIR},@{XDG_PICTURES_DIR},@{XDG_VIDEOS_DIR}}/ rw,
+owner @{HOME}/{@{XDG_MUSIC_DIR},@{XDG_PICTURES_DIR},@{XDG_VIDEOS_DIR}}/** rwk,
+
+# Read access to mounted devices
+/{media,mnt}/{,**} r,
+
+# Media devices
+/dev/{cdrom,dvd,sg[0-9],sr[0-9]} rw,

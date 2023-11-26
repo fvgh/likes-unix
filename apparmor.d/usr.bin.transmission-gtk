@@ -1,0 +1,32 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/transmission-gtk {
+
+#include <local/usr.bin.transmission-gtk>
+
+#include <abstractions/base>
+#include <abstractions/file-chooser>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/nameservice>
+#include <abstractions/user-base-rw>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+@{PROC}/@{pid}/** rw,
+
+owner @{HOME}/{.cache,.config}/transmission/** rw,
+
+# External
+##############################
+
+# UUID generator
+@{PROC}/sys/kernel/random/uuid r,
+
+}

@@ -1,0 +1,45 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/atril {
+
+#include <local/usr.bin.atril>
+
+#include <abstractions/base>
+#include <abstractions/cups-client>
+#include <abstractions/file-chooser>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/user-office-r>
+#include <abstractions/user-tmp>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+owner @{HOME}/.cache/atril/{,**} rw,
+
+@{PROC}/@{pid}/** rw,
+
+/usr/share/atril/{,**} r,
+
+# External
+##############################
+
+# App reads directory content before acessing "recently-used.xbel"
+# Should be part of abstractions/freedesktop.org
+owner @{HOME}/.local/share/ r,
+
+# HTML rendering
+/usr/lib/x86_64-linux-gnu/webkit2gtk-[0-9].[0-9]/{WebKitNetworkProcess,WebKitWebProcess} ix,
+
+# PDF to HTML (using xpdf)
+/usr/share/poppler/** r,
+
+# PS support
+/usr/share/ghostscript/*/** mr,
+
+}

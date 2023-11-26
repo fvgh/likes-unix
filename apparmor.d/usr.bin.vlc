@@ -1,0 +1,63 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/vlc {
+
+#include <local/usr.bin.vlc>
+
+#include <abstractions/audio>
+#include <abstractions/base>
+#include <abstractions/dri-enumerate>
+#include <abstractions/file-chooser>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/ibus>
+#include <abstractions/mesa>
+#include <abstractions/nvidia>
+#include <abstractions/p11-kit>
+#include <abstractions/user-media-r>
+#include <abstractions/vulkan>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+@{PROC}/ r,
+@{PROC}/self/** r,
+@{PROC}/@{pid}/** rw,
+
+owner @{HOME}/.{config,local/share}/vlc/ rw,
+owner @{HOME}/.{config,local/share}/vlc/** lmrwk,
+
+# External
+##############################
+
+# Browse external media
+/boot/vmlinuz* r,
+/dev/ r,
+
+# Read/Write DVD encryption key 
+@{HOME}/.dvdcss/ rw,
+@{HOME}/.dvdcss/** rw,
+
+# BlueRay
+@{HOME}/.config/aacs/KEYDB.cfg r,
+@{HOME}/.cache/aacs/** lmrwk,
+/usr/share/java/libbluray-*.jar r,
+
+# GTK configuration/defaults
+owner @{HOME}/.gnome/Gnome r,
+owner @{HOME}/.gtk* r,
+owner @{HOME}/.themes/ r,
+owner @{HOME}/.themes/** r,
+owner @{user_share_dirs}/themes/ r,
+owner @{user_share_dirs}/themes/** r,
+
+# Disable screen saver
+/{usr/,}bin/dash rix,
+/{usr/,}bin/xdg-screensaver Pxr -> xdg-screensaver,
+
+}

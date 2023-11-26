@@ -1,0 +1,8 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Create <local/user-base-r> for custom settings and/or adapt <tunables/xdg-user-dirs>.
+#include if exists <local/user-base-r>
+
+owner @{HOME}/{@{XDG_DOWNLOAD_DIR},@{XDG_PUBLICSHARE_DIR}}/{,**} r,

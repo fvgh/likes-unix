@@ -1,0 +1,10 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Create <local/user-office-rw> for custom settings and/or adapt <tunables/xdg-user-dirs>.
+#include if exists <local/user-office-rw>
+#include <abstractions/user-media-rw>
+
+owner @{HOME}/@{XDG_DOCUMENTS_DIR}/ r,
+owner @{HOME}/@{XDG_DOCUMENTS_DIR}/** rwk,

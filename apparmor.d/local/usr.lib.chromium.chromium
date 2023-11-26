@@ -1,0 +1,48 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Keep in mind that system monitoring and control is also accomplished via DBUS.
+# For example org.freedesktop.FileManager1 is used for the file/folder selection dialogs. 
+# AppArmor DBUS feature is not part of Debian 11. 
+# Limitations of advanced features, like the Chromium power_monitor module,
+# cannot be implemented here, since it uses org.freedesktop.UPower.Device.
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-base 
+# - Execution of other applications (opening downloaded files)
+# - Modifications of user settings (default browser, ...)
+# - Non-default plugins (most should work, but not tested)
+# - Advanced authentication (DM token magement)
+
+# Suppress noisy warnings
+##############################
+
+# Storage monitor not required for Public/Downloads access
+deny /etc/mtab r,
+
+# Machine ID is required for DM token magement (Active Directory)
+deny /etc/machine-id r,
+deny /var/lib/dbus/machine-id r,
+
+# Deny system monitoring and control
+deny @{PROC}/filesystems r,
+deny @{PROC}/pressure/* r,
+deny @{PROC}/vmstat r,
+deny @{sys}/bus/ r,
+deny @{sys}/class/ r,
+deny @{sys}/devices/system/cpu/{**/scaling_cur_freq,**/scaling_max_freq,kernel_max} r,
+deny @{sys}/devices/virtual/tty/** r,
+deny @{sys}/devices/virtual/dmi/** r,
+
+# Deny direct device access (might be used for SmartCards, and other features)
+deny /etc/udev/udev.conf r,
+deny /run/udev/data/** r,
+
+# Deny modification of desktop config
+deny /{usr/,}bin/xdg-settings rx,
+
+# Deny extensions installation
+deny @{path_lib}** w,

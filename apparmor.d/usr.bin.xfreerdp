@@ -1,0 +1,32 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/xfreerdp {
+
+#include <local/usr.bin.xfreerdp>
+
+#include <abstractions/audio>
+#include <abstractions/base>
+#include <abstractions/nameservice>
+#include <abstractions/openssl>
+#include <abstractions/user-base-rw>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+@{PROC}/ r,
+@{PROC}/self/** r,
+@{PROC}/@{pid}/** rw,
+owner /{dev,run}/shm/com.freerdp.xfreerdp* mrw,
+
+# External
+##############################
+
+# Client timezone
+/etc/timezone r,
+
+}

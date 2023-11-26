@@ -1,0 +1,13 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Read/Write  configuration stored in dconf backend via gsettings library.
+
+#include <abstractions/dconf>
+
+# Access to gsettings-desktop-schemas
+/usr/{local/,}share/glib-[0-9]*/schemas/{,**}   r,
+
+# Deny writing explicitly in your local configuration if required.
+owner /run/user/[0-9]*/dconf/user rw,

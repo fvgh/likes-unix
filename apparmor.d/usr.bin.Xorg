@@ -1,0 +1,96 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/Xorg {
+
+#include <local/usr.bin.Xorg>
+
+#include <abstractions/base>
+#include <abstractions/dbus-session-strict>
+#include <abstractions/dri-common>
+#include <abstractions/dri-enumerate>
+#include <abstractions/fonts>
+#include <abstractions/mesa>
+#include <abstractions/vulkan>
+
+capability chown,
+capability dac_override,
+capability fsetid,
+capability ipc_owner,
+capability mknod,
+capability perfmon,
+capability setgid,
+capability setuid,
+capability sys_admin,
+capability sys_nice,
+capability sys_rawio,
+capability sys_tty_config,
+
+# Check SELinux policy updates
+network netlink raw,
+
+# Internal
+##############################
+
+# Use child profiles in case Xorg does not require root privileges on your system
+/usr/bin/Xorg mrixk,
+/usr/lib/xorg/{Xorg,Xorg.wrap} mrixk,
+
+# Pre-compile keymap during start-up
+/usr/bin/{dash,xkbcomp} ix,
+/var/lib/xkb/server-[0-9].xkm rw,
+
+/etc/X11/{xorg.conf,Xwrapper.config} r,
+/etc/X11/xorg.conf.d/{,*} r,
+/usr/lib{,32,64}/xorg/modules/**.so m,
+/usr/share/X11/{,**} r,
+
+/tmp/.{,t}X[0-9]-lock lrw,
+/var/log/Xorg.[0-9].log{,.old} rw,
+/var/log/lightdm/x-[0-9].log rw,
+
+# External
+##############################
+
+
+# LightDM auth
+/run/lightdm/root/* rmk,
+/var/run/lightdm/root/* rmk,
+
+# Client communication
+/tmp/.X11-unix/* rw,
+signal send set=usr1 peer=unconfined,
+unix (bind, listen, send, receive, accept)
+  type=stream
+  addr="@/tmp/.X11-unix/X[0-9]*",
+
+# Device/Memory access
+/etc/udev/udev.conf r,
+/dev/dri/** rw,
+/dev/fb0 rw,
+/dev/input/event[0-9]* rw,
+/dev/tty7 rw,
+/dev/vga_arbiter rw,
+@{PROC}/mtrr rw,
+/usr/share/libinput/{,*} r,
+/run/udev/data/c* r,
+/run/udev/data/+{acpi:*,dmi:*,drm:*,hid:*,i2c:*,input:*,pci:*,platform:*,usb:*} r,
+@{sys}/{bus,class,devices}/{,**} mr,
+
+# Lock screen
+/dev/tty8 rw,
+
+# Used by the DRI/DRM to load a DRM kernel module when server starts (see lnx_kmod.c)
+@{PROC}/sys/kernel/modprobe r,
+/usr/bin/kmod Cx -> kmod,
+
+# Manage cache
+@{HOME}/.cache/mesa_shader_cache/??/* rw,
+
+# Display manager user login
+/etc/passwd r,
+
+}

@@ -1,0 +1,87 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <abstractions/audio>
+#include <abstractions/base>
+#include <abstractions/cups-client>
+#include <abstractions/dconf>
+#include <abstractions/freedesktop.org>
+#include <abstractions/fonts>
+#include <abstractions/nameservice>
+#include <abstractions/mesa>
+#include <abstractions/user-base-rw>
+#include <abstractions/user-tmp>
+#include <abstractions/vulkan>
+#include <abstractions/wayland>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+# User namespaces sandboxing
+capability sys_admin,
+capability sys_chroot,
+
+# Multiprocess modell
+capability sys_ptrace,
+ptrace (trace) peer=@{profile_name},
+ptrace (trace) peer=lsb_release,
+
+signal receive set=cont peer=@{path_lib}/@{path_lib}@{file_app}//null-@{path_lib}chrome_crashpad_handler,
+
+owner @{HOME}/.local/share/* w,
+owner @{HOME}/.local/share/@{dir_shm} mrw,
+owner /{dev,run}/shm/@{dir_shm} mrw,
+
+# Default profile is stored in "chromium"/"google-chrome". Please store additional profiles in "chromium*"/"google-chrome*".
+owner @{HOME}/.{cache,config}/ rw,
+owner @{HOME}/.{cache,config}/@{dir_config}*/ rw,
+owner @{HOME}/.{cache,config}/@{dir_config}*/** rwk,
+owner @{HOME}/.{cache,config}/@{dir_config}*/**/* mr,
+
+@{PROC}/ r,
+@{PROC}/self/** r,
+@{PROC}/self/exe ixr,
+@{PROC}/@{pid}/** rw,
+
+@{path_lib}* mr,
+@{path_lib}** mr,
+@{path_lib}@{file_app} ix,
+@{path_lib}chrome_crashpad_handler ix,
+
+# External
+##############################
+
+# Real-Time Communications (WebRTC)
+/dev/ r,
+/dev/video[0-9] rw,
+
+# Fonts (chrome modifies exsiting files, which is not covered by abstractions)
+owner @{HOME}/.{,cache/}fontconfig/** mrwl,
+
+# Certificate management
+owner @{HOME}/.pki/nssdb/* rwk,
+
+# Exchange of status information (Multiprocess modell) 
+owner @{PROC}/[0-9]*/{mem,clear_refs} rw,
+
+# ptrace restriction config
+@{PROC}/sys/kernel/yama/ptrace_scope r,
+
+# Network config
+@{PROC}/sys/net/ipv4/tcp_fastopen r,
+
+# File system config
+@{PROC}/sys//fs/inotify/max_user_watches r,
+
+# Shared memory (for X11)
+@{PROC}/sys/kernel/shmmax r,
+
+# Allow device capabilities detection for HW accelaeration.
+/etc/igfx_user_feature*.txt r,
+/sys/{bus,devices}/ r,
+/sys/{bus,devices}/** r,
+
+# Distro information
+/{usr/,}bin/lsb_release Pxr -> lsb_release,

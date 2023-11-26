@@ -1,0 +1,59 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/parole {
+
+#include <local/usr.bin.parole>
+
+#include <abstractions/audio>
+#include <abstractions/base>
+#include <abstractions/file-chooser>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/gstreamer>
+#include <abstractions/ibus>
+#include <abstractions/mesa>
+#include <abstractions/nvidia>
+#include <abstractions/user-media-r>
+#include <abstractions/video>
+
+# Internal
+##############################
+
+@{PROC}/ r,
+@{PROC}/self/** r,
+@{PROC}/@{pid}/** rw,
+
+/usr/share/parole/** r,
+
+# External
+##############################
+
+# Fonts
+# Should be in abstractions/fonts
+/etc/fonts/fonts.conf r,
+
+# GTK configuration/defaults
+owner @{HOME}/.gnome/Gnome r,
+owner @{HOME}/.gtk* r,
+owner @{HOME}/.themes/{,**} r,
+owner @{user_share_dirs}/themes/{,**} r,
+
+# CITRIX provides patched GStreamer plug-in for HDX
+/opt/Citrix/ICAClient/util/libgstflatstm* mr,
+
+# ISO codes for languages
+/usr/{local/,}share/xml/iso-codes/** r,
+
+# Disable screen saver
+/{usr/,}bin/dash rix,
+/{usr/,}bin/xdg-screensaver Pxr -> xdg-screensaver,
+
+# Device capabilities detection for HW acceleration.
+@{sys}/devices/pci[0-9]*/** r,
+@{sys}/bus/pci/devices/ r,
+
+}

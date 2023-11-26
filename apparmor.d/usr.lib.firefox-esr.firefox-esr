@@ -1,0 +1,86 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/lib/firefox-esr/firefox-esr {
+
+#include <local/usr.lib.firefox-esr.firefox-esr>
+
+#include <abstractions/audio>
+#include <abstractions/base>
+#include <abstractions/cups-client>
+#include <abstractions/freedesktop.org>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/nameservice>
+#include <abstractions/mesa>
+#include <abstractions/user-base-rw>
+#include <abstractions/user-tmp>
+#include <abstractions/vulkan>
+#include <abstractions/wayland>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+# User namespaces sandboxing
+capability sys_admin,
+capability sys_chroot,
+
+# Multiprocess modell
+capability sys_ptrace,
+ptrace (trace) peer=@{profile_name},
+ptrace (trace) peer=lsb_release,
+
+# Configuration
+/etc/firefox-esr/ r,
+/etc/firefox-esr/* r,
+owner @{HOME}/.{,cache/}mozilla/firefox/ rw,
+owner @{HOME}/.{,cache/}mozilla/firefox/*/ rw,
+owner @{HOME}/.{,cache/}mozilla/firefox/** rwk,
+owner @{HOME}/.{,cache/}mozilla/firefox/**/* mr,
+owner @{HOME}/.mozilla/**/extensions/** mixr,
+
+@{PROC}/ r,
+@{PROC}/self/** r,
+@{PROC}/self/exe ix,
+@{PROC}/@{pid}/** rw,
+
+/usr/lib/firefox-esr/* ixr,
+/usr/share/firefox-esr/** r,
+/usr/share/mozilla/extensions/** mixr,
+
+# External
+##############################
+
+# Detect resource limits
+@{sys}/fs/cgroup/user.slice/user-*.slice/**.scope/*.max r,
+@{sys}/devices/system/cpu/{**/cpuinfo_max_freq,present,**/size} r,
+@{sys}/devices/system/node/{,*/meminfo} r,
+
+# Real-Time Communications (WebRTC)
+/dev/video[0-9] rw,
+
+# <abstractions/fonts> bugfix
+owner @{HOME}/.{,cache/}fontconfig/** wmrlk,
+
+# Device capabilities detection for HW acceleration.
+/etc/igfx_user_feature*.txt r,
+@{sys}/devices/pci[0-9]*/** r,
+@{sys}/bus/pci/devices/ r,
+
+# Distro information
+/{usr/,}bin/lsb_release Pxr -> lsb_release,
+
+# Spell checker
+/usr/share/hunspell/ r,
+/usr/share/hunspell/* r,
+
+# Also root user should write to @{HOME}/.cache
+# But Firefox (or one of the libs) tries to change user of global cache entry.
+# Same problem occurs in other applications, like Thunderbird.
+deny /var/cache/fontconfig/ w,
+
+}

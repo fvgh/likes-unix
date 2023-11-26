@@ -1,0 +1,44 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-base 
+# - Execution of other applications (opening downloaded files)
+# - Modifications of user settings (default browser, ...)
+# - Non-default plugins (most should work, but not tested)
+# - Advanced authentication (DM token magement)
+# - Execution as root (sandboxing will not work)
+
+# Suppress noisy warnings
+##############################
+
+# Deny access to network locations
+#include <local/file-chooser>
+
+# Machine ID is required for DM token magement (Active Directory)
+deny /etc/machine-id r,
+deny /var/lib/dbus/machine-id r,
+
+# Firefox is not allowed to start external programs. Hence, default apps are not relevant.
+deny /etc/*/defaults.list r,
+deny /etc/mailcap r,
+deny /etc/mime.types r,
+deny /etc/xdg/{,*-}mimeapps.list r,
+deny /local/share/applications/mimeapps.list r,
+deny @{HOME}/opt/local/share/applications/mimeapps.list r,
+deny @{HOME}/opt/local/share/applications/ r,
+deny /usr/share/*/applications/ r,
+deny /usr/share/*/applications/mimeinfo.cache r,
+
+# Deny modification of desktop settings
+deny /run/user/*/dconf/user w,
+
+# Telemetry ping not required
+deny /usr/lib/firefox-esr/pingsender xr,
+
+# Speech-Dispatcher start seems to be more a bug than a feature
+deny /{,usr/}bin/speech-dispatcher x,
+deny /dev/ r,

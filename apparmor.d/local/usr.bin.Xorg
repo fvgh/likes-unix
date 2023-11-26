@@ -1,0 +1,12 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Only local basic features are supported
+deny /etc/nsswitch.conf r,
+
+# Xorg seems not to require start-up information of kernel and processes.
+# It is requested for processes triggered at session start.
+deny @{PROC}/cmdline r,
+deny @{PROC}/*/cmdline r,
+

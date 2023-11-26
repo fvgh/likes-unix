@@ -1,0 +1,9 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+profile chromium-sandbox /usr/lib/chromium/chrome-sandbox {
+# Prevent execution of SUID executable. chrome-sandbox not used anymore.
+# See https://chromium.googlesource.com/chromium/src/+/master/docs/linux/sandboxing.md
+}
+

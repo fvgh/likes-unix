@@ -1,0 +1,25 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-media 
+# - Any access to network (including mounts)
+
+# Suppress noisy warnings
+##############################
+
+# Deny access to network mounts
+#include <local/file-chooser>
+
+# GHB file chooser usage seems to be buggy.
+# It tries to read recently used file locations before selecting "Revent" in the dialog.
+# The profile denies most locations, thus a lot of errors are reported.
+# Deny "Recent" access. It's not useful for GHB anyhow.
+deny @{HOME}/.recently-used.xbel*    rw,
+deny @{HOME}/.local/share/recently-used.xbel* rw,
+
+# Maybe GHB looks for plugins?
+deny /usr/lib64/ r,

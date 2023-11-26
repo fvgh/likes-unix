@@ -1,0 +1,57 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+# Do not attach to /usr/bin/xdg-screensaver by default
+profile xdg-screensaver {
+#include <abstractions/ubuntu-konsole>
+
+# Needs read access to URL.
+# Profile used by players to deactivate screen saver.
+# In case of syslog deny messages, keep in mind that the URL is in hexadecimal.
+# For example (for /home...):
+# apparmor="DENIED" operation="file_inherit" profile="xdg-screensaver" name="2F686F6D65...
+#include <abstractions/user-media-r>
+
+capability sys_ptrace,
+ptrace (read, trace),
+
+owner @{HOME}/.Xauthority r,
+
+@{PROC}/ r,
+@{PROC}/*/{mount*,stat,status,environ} r,
+@{PROC}/cpuinfo r,
+@{PROC}/filesystems r,
+@{PROC}/meminfo r,
+@{PROC}/stat r,
+@{PROC}/sys/kernel/* r,
+@{PROC}/tty/drivers r,
+@{PROC}/uptime r,
+
+/{usr/,}bin/cat rix,
+/{usr/,}bin/cut rix,
+/{usr/,}bin/dash rix,
+/{usr/,}bin/dbus-send rix,
+/{usr/,}bin/gnome-screensaver-command rix,
+/{usr/,}bin/grep rix,
+/{usr/,}bin/ln rix,
+/{usr/,}bin/mktemp rix,
+/{usr/,}bin/mv rix,
+/{usr/,}bin/perl rix,
+/{usr/,}bin/ps rix,
+/{usr/,}bin/rm rix,
+/{usr/,}bin/sed rix,
+/{usr/,}bin/sleep rix,
+/{usr/,}bin/which{.debianutils,} rix,
+/{usr/,}bin/xdg-screensaver r,
+/{usr/,}bin/xprop rix,
+/{usr/,}bin/xset rix,
+
+/usr/share/perl*/** r,
+
+#Requested by ps for memory information, which is never used by xdg-screensaver
+deny @{sys}/devices/system/node{,/**} r,
+
+}

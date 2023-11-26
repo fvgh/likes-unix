@@ -1,0 +1,40 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/simple-scan {
+
+#include <local/usr.bin.simple-scan>
+
+#include <abstractions/base>
+#include <abstractions/file-chooser>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/user-office-rw>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+@{PROC}/@{pid}/** rw,
+
+@{HOME}/.cache/simple-scan/{,**} rw,
+
+# External
+##############################
+
+# simple-scan is a sane front-end
+/etc/sane.d/** r,
+
+# Allow USB scanner HW detection
+/dev/ r,
+/dev/bus/usb/ r,
+/dev/bus/usb/** rw,
+@{sys}/bus/ r,
+@{sys}/bus/usb/devices/ r,
+@{sys}/devices/pci*/*/usb[0-9]/** r,
+/run/udev/data/** r,
+
+}

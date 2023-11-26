@@ -1,0 +1,28 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Deny access to network mounts
+#include <local/file-chooser>
+
+# Machine ID might be required required for DRM
+deny /etc/machine-id r,
+deny /var/lib/dbus/machine-id r,
+
+# Deny access of common QT file dialog properties (last visited directory).
+# This leads to unexpected complaints in case the visited directory is not accessable for VLC.
+# Hence, the file dialog will start in /etc/. The corresponding error is eaten.
+deny @{HOME}/.config/QtProject.conf rw,
+deny /etc/ r,
+
+# Noisy (seems not to be required)
+deny @{PROC}/sys/kernel/random/boot_id r,
+
+# Deny modification of desktop settings
+deny /run/user/*/dconf/user w,
+
+# Deny system information access (used for meminfo)
+deny /sys/devices/system/node/ r,
+
+# Noisy: Update meta-data not possible
+deny /**/*.{avi,mkv,mp4,m4v} w,

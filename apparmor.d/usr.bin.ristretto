@@ -1,0 +1,29 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/ristretto {
+
+#include <local/usr.bin.ristretto>
+
+#include <abstractions/base>
+#include <abstractions/file-chooser>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/user-media-r>
+#include <abstractions/X>
+
+# Internal
+##############################
+
+@{PROC}/@{pid}/** rw,
+
+# Allow configuration changes
+owner @{HOME}/.{config,local/share}/ristretto/{,**} rw,
+
+# External
+##############################
+
+}

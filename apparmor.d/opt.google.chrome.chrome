@@ -1,0 +1,21 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+@{path_lib} = /opt/google/chrome/
+@{file_app} = chrome
+@{dir_config} = google-chrome
+@{dir_shm} = {,.}com.google.Chrome.*
+
+/opt/google/chrome/chrome {
+
+#include <local/opt.google.chrome.chrome>
+#include <abstractions/chromium>
+
+# chrome specific helpers
+@{path_lib}nacl_helper ixr,
+
+}
+

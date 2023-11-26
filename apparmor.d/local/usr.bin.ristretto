@@ -1,0 +1,32 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-media 
+# - Modification of documents (meta-data)
+# - Any access to network (including mounts)
+
+# Suppress noisy warnings
+##############################
+
+# Deny access to network locations
+#include <local/file-chooser>
+
+# App is not allowed to start external programs. Hence, default apps are not relevant.
+deny /etc/*/defaults.list r,
+deny /etc/magic r,
+deny /etc/xdg/{,*-}mimeapps.list r,
+deny @{HOME}/opt/local/share/applications/mimeapps.list r,
+deny @{HOME}/opt/local/share/applications/ r,
+deny /usr/share/*/applications/ r,
+deny /usr/share/*/applications/mimeinfo.cache r,
+
+# For unknown reason ristretto wants to load some icons from Firefox.
+deny /usr/share/firefox-esr/** r,
+
+# Deny modification of desktop settings
+deny /run/user/*/dconf/user w,
+

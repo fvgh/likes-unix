@@ -1,0 +1,6 @@
+#Build output
+**/debian
+/check.*
+
+#VI tmp files
+**/*.swp

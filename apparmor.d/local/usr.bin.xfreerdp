@@ -1,0 +1,18 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-base 
+
+# Suppress noisy warnings
+##############################
+
+# Machine id (see https://www.freedesktop.org/software/systemd/man/machine-id.html) seems not to be required.
+deny /etc/machine-id r,
+deny /var/lib/dbus/machine-id r,
+
+# HW information seems not to be required.
+deny /sys/devices/system/node/ r,

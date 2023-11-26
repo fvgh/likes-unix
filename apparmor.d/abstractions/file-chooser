@@ -1,0 +1,23 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Basic permissions for file chooser.
+# Advanced permissions, like network access and thumbnails, are not granted.
+# The <local/file-chooser> defaults deny such access explicitly.
+
+#include <abstractions/freedesktop.org>
+
+# File browser shortcuts to devices
+/etc/fstab r,
+
+# Avoid errors when browsing default locations
+/ r,
+owner @{HOME}/ r,
+
+# Support bookmarks
+owner @{HOME}/.config/gtk-???/bookmarks r,
+
+# Some implementations read directory content before acessing "recently-used.xbel"
+# Should be part of abstractions/freedesktop.org
+owner @{HOME}/.local/share/ r,

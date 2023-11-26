@@ -1,0 +1,18 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Create <local/user-media-r> for custom settings and/or adapt <tunables/xdg-user-dirs>.
+#include if exists <local/user-media-r>
+#include <abstractions/user-base-r>
+
+# {apparmor.vim work-around}/*
+
+owner @{HOME}/{@{XDG_MUSIC_DIR},@{XDG_PICTURES_DIR},@{XDG_VIDEOS_DIR}}/ r,
+owner @{HOME}/{@{XDG_MUSIC_DIR},@{XDG_PICTURES_DIR},@{XDG_VIDEOS_DIR}}/** r,
+
+# Mounted devices
+/{media,mnt}/{,**} r,
+
+# Media devices
+/dev/{cdrom,dvd,sg[0-9],sr[0-9]} r,

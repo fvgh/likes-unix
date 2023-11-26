@@ -1,0 +1,41 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+#include <tunables/global>
+
+/usr/bin/ghb {
+
+#include <local/usr.bin.ghb>
+
+#include <abstractions/base>
+#include <abstractions/file-chooser>
+#include <abstractions/fonts>
+#include <abstractions/gsettings>
+#include <abstractions/gstreamer>
+#include <abstractions/user-media-rw>
+
+# Internal
+##############################
+
+@{PROC}/ r,
+@{PROC}/@{pid}/** rw,
+
+owner @{HOME}/.config/ghb/ rw,
+owner @{HOME}/.config/ghb/** lmrwk,
+owner /tmp/hb.@{pid}/ rw,
+owner /tmp/hb.@{pid}/** lmrwk,
+
+# External
+##############################
+
+# CITRIX provides patched GStreamer plug-in for HDX
+/opt/Citrix/ICAClient/util/libgstflatstm* mr,
+
+# abstractions/gstreamer misses vendor access
+/sys/devices/pci[0-9]*/**/{busnum,config,devnum,descriptors,idProduct,idVendor,irq,resource,revision,speed,uevent,vendor} r,
+
+# Read/Write encryption key 
+@{HOME}/.dvdcss/{,**} rw,
+
+}

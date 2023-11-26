@@ -1,0 +1,15 @@
+# vim:syntax=apparmor:inde=()
+# Copyright (c) 2024 Frank Vennemeyer
+# SPDX-License-Identifier: 0BSD
+
+# Default denials for extended file chooser functionality.
+# Note that the customization is not included by <abstractions/file-chooser>, 
+# since restriction of functionality should only be handled by local profile customization.
+
+# Deny access to network locations
+deny /etc/nsswitch.conf r,
+deny /etc/passwd r,
+
+# Deny thumbnails and drop the errors
+deny @{HOME}/.cache/thumbnails/** r,
+deny @{HOME}/.xsession-errors r,
