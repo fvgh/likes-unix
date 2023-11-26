@@ -1,0 +1,5 @@
+#Build output
+**/build/output
+
+#VI tmp files
+**/*.swp

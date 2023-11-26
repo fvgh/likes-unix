@@ -1,0 +1,8 @@
+# vim:syntax=apparmor:inde=()
+# SPDX-License-Identifier: 0BSD
+
+# Create <local/user-office-r> for custom settings and/or adapt <tunables/xdg-user-dirs>.
+#include if exists <local/user-office-r>
+#include <abstractions/user-media-r>
+
+owner @{HOME}/@{XDG_DOCUMENTS_DIR}/{,**} r,
