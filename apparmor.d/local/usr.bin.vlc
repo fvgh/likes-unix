@@ -1,0 +1,31 @@
+# vim:syntax=apparmor:inde=()
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Only read access is granted to user-media
+#include <local/file-chooser> #Access to network mounts is not allowed
+deny /**/*.{avi,mkv,mp4,m4v} w, #Update of meta-data not allowed
+
+# - Global user configuration not allowed
+deny /run/user/*/dconf/user w,
+
+# Suppress noisy warnings
+##############################
+
+# Machine ID might be required required for DRM
+deny /etc/machine-id r,
+deny /var/lib/dbus/machine-id r,
+
+# Deny access of common QT file dialog properties (last visited directory).
+# This leads to unexpected complaints in case the visited directory is not accessable for VLC.
+# Hence, the file dialog will start in /etc/. The corresponding error is eaten.
+deny @{HOME}/.config/QtProject.conf rw,
+deny /etc/ r,
+
+# Seems not to be used
+deny @{PROC}/sys/kernel/random/boot_id r,
+
+# Deny system information access (used for meminfo)
+deny /sys/devices/system/node/ r,

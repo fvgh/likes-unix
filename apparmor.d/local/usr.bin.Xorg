@@ -1,0 +1,15 @@
+# vim:syntax=apparmor:inde=()
+# SPDX-License-Identifier: 0BSD
+
+# Only local basic features are supported
+deny /etc/nsswitch.conf r,
+
+# net_admin requested on user logout for unknown reason
+deny capability net_admin,
+
+
+# Xorg seems not to require start-up information of kernel and processes.
+# It is requested for processes triggered at session start.
+deny @{PROC}/cmdline r,
+deny @{PROC}/*/cmdline r,
+

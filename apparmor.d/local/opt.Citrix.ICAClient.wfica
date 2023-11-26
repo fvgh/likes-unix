@@ -1,0 +1,21 @@
+# vim:syntax=apparmor:inde=()
+# SPDX-License-Identifier: 0BSD
+
+# Not supported by profile
+##############################
+
+# - Access documents outside of user-base
+# - Certificate sharing
+deny @{HOME}/.mozilla/** r,
+# - Video
+deny /dev/video* r,
+
+# Suppress noisy warnings
+##############################
+
+# Machine ID might be required required for DRM
+deny /etc/machine-id r,
+deny /var/lib/dbus/machine-id r,
+
+# No printer support
+deny /usr/bin/lpstat rwx,  

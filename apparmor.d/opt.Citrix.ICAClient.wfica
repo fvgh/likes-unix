@@ -1,0 +1,49 @@
+# Last Modified: Fri Jun 23 14:29:07 2023
+#include <tunables/global>
+
+# vim:syntax=apparmor
+# SPDX-License-Identifier: 0BSD
+
+
+/opt/Citrix/ICAClient/wfica {
+
+#include <abstractions/audio>
+#include <abstractions/base>
+#include <abstractions/fonts>
+#include <abstractions/freedesktop.org>
+#include <abstractions/nameservice>
+#include <abstractions/python>
+#include <abstractions/user-base-rw>
+#include <abstractions/user-tmp>
+#include <abstractions/X>
+#include <local/opt.Citrix.ICAClient.wfica>
+
+# Internal
+###########################################
+
+/etc/icaclient/{,**} mr,
+/etc/icalicense/{,**} mrw,
+/opt/Citrix/ICAClient/{,**} ixmr,
+/opt/Citrix/ICAClient/util/* ix,
+/opt/etc/Citrix/ICAClient/{,**} mr,
+/opt/etc/icaclient/{,**} mr,
+owner @{HOME}/.GA_ClientID rw,
+owner @{HOME}/.ICAClient/{,**} rwk,
+@{PROC}/@{pid}/** rw, #No owner protection, created as root
+owner /dev/shm/IpcGBufferCwaBuffer* rw,
+/var/log/citrix/{,*} rwk,
+
+# External
+###########################################
+
+/etc/timezone r,
+/etc/udev/udev.conf r,
+/etc/xml/catalog r,
+@{PROC}/ r,
+@{PROC}/sys/vm/overcommit_memory r,
+@{sys}/devices/LNXSYSTM:00/**/power_supply/** r,
+@{sys}/devices/system/cpu/present r,
+@{sys}devices/virtual/dmi/id/product_name r,
+/usr/bin/{cut,dash,getopt,*gnu-gcc*,grep,lsb_release,python*,timedatectli,timezone,tr,udevadm,uname} mrix,
+
+}
